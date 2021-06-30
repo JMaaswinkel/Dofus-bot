@@ -1,0 +1,26 @@
+{
+    "Name":         "F2P_Astrub_Nettles",
+    "Author":       "FlubberPoes",
+    "SubOnly":      "False",
+    "Territory":    "Astrub",
+    "Plant":        "Nettle", 
+
+    "Coordinates":[
+       {
+            "x": "977",
+            "y": "910"
+        },
+        {
+            "x": "1300",
+            "y": "910"
+        },
+        {
+            "x": "290",
+            "y": "690"
+        },
+        {
+            "x": "290",
+            "y": "690"
+        }
+    ]
+}

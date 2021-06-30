@@ -1,0 +1,34 @@
+{
+    "Version": "Beta 0.1",
+    "Author": "FlubberPoes",
+
+    "map_switch_coords": [
+        {
+            "UP_MAP": [
+                {
+                "x": "",
+                "y": ""
+                }
+            ],
+            "RIGHT_MAP": [
+                {
+                "x": "",
+                "y": ""
+                }
+            ],
+            "DOWN_MAP": [
+                {
+                "x": "",
+                "y": ""
+                }
+            ],
+            "LEFT_MAP": [
+                {
+                "x": "",
+                "y": ""
+                }
+            ]
+        }
+    ]
+    
+}
