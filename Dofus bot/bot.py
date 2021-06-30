@@ -2,9 +2,10 @@ import time
 import win32api, win32con
 import json
 import os
-from screen_search import *
 import cv2 as cv
-
+from plugins.searchMap import *
+import pyautogui
+import numpy as np
 
 firstStart = True
 hasToWalkToRoute = False
@@ -12,19 +13,56 @@ hasToDoRoute = True
 
 def click(x,y):
     win32api.SetCursorPos((x, y))
-    time.sleep(5)
     print("Clicking on object")
+    time.sleep(0.5)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-    time.sleep(0.075)
+    time.sleep(0.175)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+    time.sleep(0.2)
     
-def moveToMap(x, y):
-    time.sleep(random.randint(10, 13))
-    win32api.SetCursorPos((x, y))
-    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-    time.sleep(0.075)
-    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+def moveToMap():
+    with open('modules\F2P_Astrub_Nettles\F2P_Astrub_Nettles.json') as module:
+        data = json.load(module)
+        for route in data['walk_to_route']:
+            time.sleep(10)
+            if route['direction'] == 'up':
+                win32api.SetCursorPos((int(setMapCoords.up_x), int(setMapCoords.up_y)))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                time.sleep(0.075)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+            elif route['direction'] == 'right':
+                win32api.SetCursorPos((int(setMapCoords.right_x), int(setMapCoords.right_y)))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                time.sleep(0.075)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+            elif route['direction'] == 'down':
+                win32api.SetCursorPos((int(setMapCoords.down_x), int(setMapCoords.down_y)))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                time.sleep(0.075)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+            elif route['direction'] == 'left':
+                win32api.SetCursorPos((int(setMapCoords.left_x), int(setMapCoords.left_y)))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                time.sleep(0.075)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
 
+def setMapCoords():
+    with open('config.json') as configjson:
+        data = json.load(configjson)
+    # set the up coords
+    setMapCoords.up_x = data['map_switch_coords'][0]["UP_MAP"][0]["x"]
+    setMapCoords.up_y = data['map_switch_coords'][0]["UP_MAP"][0]["y"]
+    # set the right coords
+    setMapCoords.right_x = data['map_switch_coords'][0]["RIGHT_MAP"][0]["x"]
+    setMapCoords.right_y = data['map_switch_coords'][0]["RIGHT_MAP"][0]["y"]
+    # set the down coords
+    setMapCoords.down_x = data['map_switch_coords'][0]["DOWN_MAP"][0]["x"]
+    setMapCoords.down_y = data['map_switch_coords'][0]["DOWN_MAP"][0]["y"]
+    # set the left coords
+    setMapCoords.left_x = data['map_switch_coords'][0]["LEFT_MAP"][0]["x"]
+    setMapCoords.left_y = data['map_switch_coords'][0]["LEFT_MAP"][0]["y"]
+    configjson.close()
+    
 def clickObject(needle, haystack):
     takeScreenshot("images\\screen_dump\\screen_dump.png")
     img_rgb = cv.imread(haystack)
@@ -36,10 +74,17 @@ def clickObject(needle, haystack):
     loc = np.where( res >= threshold)
     middleWidth = w // 2
     middleHeight = h // 2
+    targetx = None
+    targety = None
     for pt in zip(*loc[::-1]):
-        click(pt[0] + middleWidth , pt[1] + middleHeight)
+        # click(pt[0] + middleWidth , pt[1] + middleHeight)
+        targetx = pt[0] + middleWidth
+        targety= pt[1] + middleHeight
         cv.rectangle(img_rgb, pt, (pt[0] + w , pt[1] + h), (0,0,255), 2)
     cv.imwrite('res.png',img_rgb)
+    if targety and targetx:
+        click(targetx, targety)
+        time.sleep(7)
 
 def takeScreenshot(path):
     pyautogui.keyDown('y')
@@ -48,74 +93,63 @@ def takeScreenshot(path):
     myScreenshot.save(path)
     pyautogui.keyUp('y')
 
-def searchMapSwitch():
-    for x in range(320, 350):
-        win32api.SetCursorPos((x, 200))
-        myScreenshot = pyautogui.screenshot()
-        myScreenshot.save("images\\screen_dump\\screen_dump.png")
-        img_rgb = cv.imread("images\\screen_dump\\screen_dump.png")
-        img_gray = cv.cvtColor(img_rgb, cv.COLOR_BGR2GRAY)
-        template = cv.imread("images\\cursor\\map_left.png",0)
-        w, h = template.shape[::-1]
-        res = cv.matchTemplate(img_gray,template,cv.TM_CCOEFF_NORMED)
-        threshold = 0.7
-        min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-        if max_val >= threshold:
-            print('found left pos')
-            print (max_val)
-            print(max_loc)
-            break
-    x, y = pyautogui.position()
+def doRoute():
+     with open('modules\F2P_Astrub_Nettles\F2P_Astrub_Nettles.json') as module:
+        data = json.load(module)
+        for route in data['do_route']:
+            clickObject("images\\nettles.png", "images\\screen_dump\\screen_dump.png")
+            if route['direction'] == 'up':
+                win32api.SetCursorPos((int(setMapCoords.up_x), int(setMapCoords.up_y)))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                time.sleep(0.075)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+            elif route['direction'] == 'right':
+                win32api.SetCursorPos((int(setMapCoords.right_x), int(setMapCoords.right_y)))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                time.sleep(0.075)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+            elif route['direction'] == 'down':
+                win32api.SetCursorPos((int(setMapCoords.down_x), int(setMapCoords.down_y)))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                time.sleep(0.075)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+            elif route['direction'] == 'left':
+                win32api.SetCursorPos((int(setMapCoords.left_x), int(setMapCoords.left_y)))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                time.sleep(0.075)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+            time.sleep(10)
+def checkConfigSet():
+    directions = ["UP_MAP", "RIGHT_MAP", "DOWN_MAP", "LEFT_MAP"]
+    with open('config.json') as configjson:
+        data = json.load(configjson)
+        if data['configSet'] == "False":
+            configSet = False
+        else:
+            return
+        for direction in directions:
+            if len(data['map_switch_coords'][0][direction][0]["x"]) != 0 or len(data['map_switch_coords'][0][direction][0]["y"]) != 0:
+                configSet = True
+            else:
+                configSet = False
+                break
+        configjson.close()
 
-    win32api.SetCursorPos((x, y))    
-    # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-    # time.sleep(0.075)
-    # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-        
+    data['configSet'] = str(configSet)
+    jsonfile = open("config.json", 'w')
+    jsonfile.write(json.dumps(data, indent=4))
+    
+
 def main():
-    # clickObject("images\\nettles.png", "images\\screen_dump\\screen_dump.png")
-    searchMapSwitch()
+    time.sleep(3)
+    setMapCoords()
+    doRoute()
+ 
+    
 
 if __name__ == "__main__":
     main()
-# how to calculate middle:
-# pt[0] + middleWidth , pt[1] + middleHeight
-
-# def selectModule():
-#     counter = 1
-#     print("Select your desired module:")
-#     for modules in os.walk('modules'):
-#         if '\\' in modules[0]:
-#             folder, module = modules[0].split('\\')
-#             print("Module", counter, ": ",module)
-#             counter += 1
-            
-#     selectedModule = input()
-#     for modules in os.walk('modules'):
-#         if '\\' in modules[0]:
-#             folder, pickedModule = modules[0].split('\\')
-#             if selectedModule == pickedModule:
-#                 print("Succes!")
-#             elif selectedModule != pickedModule:
-#                 print('foutttt')
-
-# if(firstStart == True):
-#     selectModule()
 
 
-# if hasToWalkToRoute == True:
-#     hasToWalkToRoute == False
-#     with open('modules\F2P_Astrub_Nettles\F2P_Astrub_Walk_to_Area.json') as f:
-#         data = json.load(f)
-#         for i in data['Coordinates']:
-#             moveToMap(int(i['x']), int(i['y']))
-#     f.close()
-
-# if hasToDoRoute == True :
-#     with open('modules\F2P_Astrub_Nettles\F2P_Astrub_Nettles.json') as f:
-#         data = json.load(f)
-#         for i in data['Coordinates']:
-#             click(int(i['x']), int(i['y']))
-#         hasToDoRoute = False
-#     f.close()  
+ 
 

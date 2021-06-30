@@ -1,34 +1,33 @@
 {
     "Version": "Beta 0.1",
     "Author": "FlubberPoes",
-
     "map_switch_coords": [
         {
             "UP_MAP": [
                 {
-                "x": "",
-                "y": ""
+                    "x": "600",
+                    "y": "27"
                 }
             ],
             "RIGHT_MAP": [
                 {
-                "x": "",
-                "y": ""
+                    "x": "1593",
+                    "y": "600"
                 }
             ],
             "DOWN_MAP": [
                 {
-                "x": "",
-                "y": ""
+                    "x": "600",
+                    "y": "921"
                 }
             ],
             "LEFT_MAP": [
                 {
-                "x": "",
-                "y": ""
+                    "x": "327",
+                    "y": "200"
                 }
             ]
         }
-    ]
-    
+    ],
+    "configSet": "True"
 }
