@@ -20,7 +20,7 @@ def click(x,y):
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
     time.sleep(0.2)
     
-    # dit is een test
+    
 def moveToMap():
     with open('modules\F2P_Astrub_Nettles\F2P_Astrub_Nettles.json') as module:
         data = json.load(module)
